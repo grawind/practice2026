@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Получение сообщений, отправленных посредством алгоритмов шифрования</title>
+
+    <style>
+        * {
+            font-family: Comic Sans MS, Comic Sans, cursive;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #343434;
+        }
+
+        h1 {
+            position: relative;
+            text-align: center;
+            color: #34aa65;
+            text-shadow: 2px 2px 4px #194029,
+                        3px 4px 4px #0f2418,
+                        4px 6px 4px #142e1e,
+                        5px 8px 4px #13301f;
+        }
+
+        .title-1 {
+            position: absolute;
+            top: 15vh;
+            left: 2vw;
+            color: #34aa65;
+            text-shadow: 2px 2px 4px #194029,
+                        3px 4px 4px #0f2418,
+                        4px 6px 4px #142e1e,
+                        5px 8px 4px #13301f;
+        }
+
+        .received {
+            position: absolute;
+            top: 25vh;
+            left: 55vw;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .received-cypher {
+            position: absolute;
+            top: 25vh;
+            left: 2vw;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .text-output-cypher {
+            width: 40vw;
+            padding: 10px;
+            border: 3px solid #2c8853;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-size: 16px;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .text-output-cypher:focus {
+            outline: none;
+        }
+
+        .text-output {
+            width: 40vw;
+            padding: 10px;
+            border: 3px solid #2c8853;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-size: 16px;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .text-output:focus {
+            outline: none;
+        }
+
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: #e74c3c;
+            font-size: 14px;
+            background: #2d2d2d;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #e74c3c;
+        }
+
+        .connection-status.connected {
+            color: #2ecc71;
+            border-color: #2ecc71;
+        }
+
+        .rsa-key-block {
+            position: absolute;
+            top: 1vh;
+            left: 65vw;
+            background: #2d2d2d;
+            border: 2px solid #2980b9;
+            border-radius: 8px;
+            padding: 15px;
+           /* max-width: 20vw;*/
+            min-width: 10vw;
+            word-wrap: break-word;
+            display: flex;
+            gap: 20px; /*отступ между элементами*/
+            align-items: flex-start;
+            white-space: nowrap;
+        }
+
+        .rsa-key-block h3 {
+            color: #3498db;
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .keys-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1vh;
+        }
+
+        .key-item strong {
+            color: #3498db;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .key-item p {
+            color: #85c1e9;
+            margin: 0;
+            font-size: 11px;
+            background: #1a1a1a;
+            padding: 8px;
+            border-radius: 4px;
+            max-height: 6vh;
+            overflow-y: auto;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>Получение сообщений</h1>
+
+        <div class="rsa-key-block" id="rsa-key-block">
+            <h3>RSA ключи:</h3>
+            <div class="keys-container">
+                <div class="key-item">
+                    <strong>Public key:</strong>
+                    <p id="key-rsa-public"></p>
+                </div>
+                <div class="key-item">
+                    <strong>Private key:</strong>
+                    <p id="key-rsa-private"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="title-1">
+            <h2>Полученные сообщения</h2>
+        </div>
+
+        <div class="received-cypher">
+            <textarea class="text-output-cypher" 
+                      id="text-output-cypher" 
+                      placeholder="Здесь будут отображаться полученные сообщения в зашифрованном виде..."
+                      readonly></textarea>
+        </div>
+        <div class="received" id="received">
+            <textarea class="text-output" 
+                      id="text-output" 
+                      placeholder="Здесь будут отображаться полученные сообщения в расшифрованном виде..."
+                      readonly></textarea>
+        </div>
+
+        <div class="connection-status" id="connection-status">
+            Статус: отключен
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const TextOut = document.getElementById('text-output');
+            const TextOutCypher = document.getElementById('text-output-cypher');
+            const RSAPublicKey = document.getElementById('key-rsa-public');
+            const RSAPrivateKey = document.getElementById('key-rsa-private');
+            const ConnectionStatus = document.getElementById('connection-status');
+
+            const ws = new WebSocket('ws://193.109.78.189:9002/ws');
+
+            let s_cypher = 1;
+            let s = 1
+
+            ws.addEventListener('open', (event) => {
+                ConnectionStatus.textContent = 'Статус: подключен';
+                ConnectionStatus.classList.add('connected');
+            });
+
+            ws.addEventListener('message', (event) => {
+                const data = JSON.parse(event.data);
+                console.log(event.data);
+
+                if (data.rsa_public && data.rsa_private) {
+                    RSAPublicKey.textContent = data.rsa_public;
+                    RSAPrivateKey.textContent = data.rsa_private;
+                }
+
+                if (data.encrypted) {
+                    console.log('Получено зашифрованное сообщение: ', data.encrypted);
+                    TextOutCypher.value += '[Зашифрованное ${s_cypher}]: ${data.encrypted}\n';
+                    s_cypher++;
+                }
+
+                if (data.decrypted) {
+                    console.log('Получено расшифрованное сообщение: ', data.decrypted);
+                    TextOut.value += '[Расшифрованное ${s}]: ${data.decrypted}\n';
+                    s++;
+                }
+            });
+
+            ws.addEventListener('error', (event) => {
+                console.log('Произошла WebSocket ошибка: ', event.data);
+                ConnectionStatus.textContent = 'Статус: ошибка';
+            });
+
+            ws.addEventListener('close', (event) => {
+                console.log('Соединение закрыто: ', event.code, event.reason);
+                ConnectionStatus.textContent = 'Статус: отключен';
+                ConnectionStatus.classList.remove('connected');
+            });
+        });
+    </script>
+    
+</body>
+</html>
