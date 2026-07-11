@@ -238,13 +238,13 @@
                 ConnectionStatus.classList.remove('connected');
             });
 
-            MailBtn.addEventListener('click', () => {
-                e.preventDefault();
+            MailBtn.addEventListener('click', (event) => {
+                event.preventDefault();
                 sendMessage(TextInput.value.trim());
             });
 
             AESBtn.addEventListener('click', () => {
-                ws.send(JSON.stringfy({
+                ws.send(JSON.stringify({
                     AES_key: ""
                 }));
             });
@@ -256,7 +256,7 @@
             function sendMessage(message) {
                 if(!message) return;
 
-                ws.send(JSON.stringfy({
+                ws.send(JSON.stringify({
                     message: message
                 }));
 
