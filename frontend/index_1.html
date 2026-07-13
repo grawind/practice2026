@@ -99,7 +99,7 @@
 
         .aes-btn {
             position: absolute;
-            top: 16vh;
+            top: 20vh;
             right: 25vw;
             width: 11vw;
             height: 5vh;
@@ -211,7 +211,7 @@
             const ConnectionStatus = document.getElementById('connection-status');
             const TextForm = document.getElementById('text-form');
 
-            const ws = new WebSocket('ws://localhost:8081/ws');
+            const ws = new WebSocket('ws://185.255.133.17:8081/ws');
 
             ws.addEventListener('open', (event) => {
                 ConnectionStatus.textContent = 'Статус: Подключен';

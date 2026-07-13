@@ -40,7 +40,7 @@
 
         .received {
             position: absolute;
-            top: 25vh;
+            top: 30vh;
             left: 55vw;
             max-width: 500px;
             margin: 0 auto;
@@ -48,7 +48,7 @@
 
         .received-cypher {
             position: absolute;
-            top: 25vh;
+            top: 30vh;
             left: 2vw;
             max-width: 500px;
             margin: 0 auto;
@@ -111,13 +111,13 @@
             border: 2px solid #2980b9;
             border-radius: 8px;
             padding: 15px;
-           /* max-width: 20vw;*/
             min-width: 10vw;
+            /*max-width: 20vw;*/
             word-wrap: break-word;
             display: flex;
             gap: 20px; /*отступ между элементами*/
             align-items: flex-start;
-            white-space: nowrap;
+            max-width: 29vw;
         }
 
         .rsa-key-block h3 {
@@ -144,13 +144,15 @@
         .key-item p {
             color: #85c1e9;
             margin: 0;
-            font-size: 11px;
+            font-size: 5px;
             background: #1a1a1a;
             padding: 8px;
             border-radius: 4px;
             max-height: 6vh;
             overflow-y: auto;
-            white-space: nowrap;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            white-space: normal;
         }
     </style>
 </head>
