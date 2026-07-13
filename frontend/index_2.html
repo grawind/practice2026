@@ -223,13 +223,13 @@
 
                 if (data.encrypted) {
                     console.log('Получено зашифрованное сообщение: ', data.encrypted);
-                    TextOutCypher.value += '[Зашифрованное ${s_cypher}]: ${data.encrypted}\n';
+                    TextOutCypher.value += `[Зашифрованное ${s_cypher}]: ${data.encrypted}\n`;
                     s_cypher++;
                 }
 
                 if (data.decrypted) {
                     console.log('Получено расшифрованное сообщение: ', data.decrypted);
-                    TextOut.value += '[Расшифрованное ${s}]: ${data.decrypted}\n';
+                    TextOut.value += `[Расшифрованное ${s}]: ${data.decrypted}\n`;
                     s++;
                 }
             });
